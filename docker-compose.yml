@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  api-tests:
+    build: ./api-tests
+    volumes:
+      - ./api-tests/tests:/app/tests
+    command: ["pytest", "tests/", "-q", "--maxfail=1"]
+
+  # e2e-tests:
+  #   build: ./e2e-tests
+  #   volumes:
+  #     - ./e2e-tests:/workspace
+  #   environment:
+  #     - CI=true
+  #   command: ["npx", "playwright", "test", "--reporter=list"]
+  # k6:
+  #   build: ./perf-tests
+  #   volumes:
+  #     - ./perf-tests/k6:/k6
+  #   command: ["k6", "run", "/k6/posts_load_test.js"]
