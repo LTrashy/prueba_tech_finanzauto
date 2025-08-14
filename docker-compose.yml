@@ -5,4 +5,11 @@ services:
     volumes:
       - ./api-tests/tests:/app/tests
     command: ["pytest", "tests/", "-q", "--maxfail=1"]
-
+  e2e-tests:
+    build: ./e2e-tests
+    volumes:
+      - ./e2e-tests/tests:/workspace/tests
+    environment:
+      - CI=true
+    command: ["npx", "playwright", "test", "--reporter=list"]
+  
