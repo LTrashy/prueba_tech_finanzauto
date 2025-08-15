@@ -20,7 +20,7 @@ Pruebas automatizadas sobre endpoints de API, verificando:
 
 ### Cómo ejecutar
 ```bash
-docker compose up api-tests
+sudo docker compose run --rm api-tests
 ```
 ---
 
