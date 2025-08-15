@@ -1,14 +1,10 @@
-# e2e-tests/Dockerfile
-FROM mcr.microsoft.com/playwright:focal
+FROM python:3.10-slim
 
-WORKDIR /workspace
+WORKDIR /app
 
-# Copiar el código (tests incluidos)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-# Crear package.json si no existe e instalar @playwright/test
-RUN test -f package.json || npm init -y && \
-    npm install @playwright/test@latest && \
-    npx playwright install --with-deps
-
-CMD ["npx", "playwright", "test", "--reporter=list"]
+CMD ["pytest", "--html=report.html", "--self-contained-html"]

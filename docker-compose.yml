@@ -5,11 +5,59 @@ services:
     volumes:
       - ./api-tests/tests:/app/tests
     command: ["pytest", "tests/", "-q", "--maxfail=1"]
-  e2e-tests:
-    build: ./e2e-tests
-    volumes:
-      - ./e2e-tests/tests:/workspace/tests
+  selenium-chrome:
+    image: selenium/standalone-chrome:4.21.0
+    shm_size: 2gb
+    ports:
+      - "4444:4444"
+      - "7900:7900"
     environment:
-      - CI=true
-    command: ["npx", "playwright", "test", "--reporter=list"]
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_NODE_MAX_SESSIONS=1
+      - VNC_NO_PASSWORD=1 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  e2e-selenium:
+    build: ./e2e-tests
+    depends_on:
+      selenium-chrome:
+        condition: service_healthy
+    volumes:
+      - ./e2e-tests:/app
+    container_name: e2e-tests
+
+  locust-json:
+    build: ./perf-tests
+    command: >
+      locust -f locust_jsonplaceholder.py JSONPlaceholderUser
+      --headless -u 100 -r 10 --run-time 2m
+      --csv results/jsonplaceholder
+    working_dir: /app
+    volumes:
+      - ./perf-tests/results:/app/results
+
+  locust-reqres:
+    build: ./perf-tests
+    command: >
+      locust -f locust_reqres.py ReqResUser
+      --headless -u 50 -r 5 --run-time 2m
+      --csv results/reqres
+    working_dir: /app
+    volumes:
+      - ./perf-tests/results:/app/results
+
+  locust-petstore:
+    build: ./perf-tests
+    command: >
+      locust -f locust_petstore.py PetstoreUser
+      --headless -u 200 -r 10 --run-time 1m
+      --csv results/petstore
+    working_dir: /app
+    volumes:
+      - ./perf-tests/results:/app/results
+      
   

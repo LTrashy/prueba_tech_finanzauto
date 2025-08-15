@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences
+GET,/api/users?page=2,HTTPError('429 Client Error: Too Many Requests for url: /api/users?page=2'),7213
